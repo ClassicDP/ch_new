@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>res/Клетка белая.svg</file>
+        <file>res/Клетка черная.svg</file>
+        <file>res/Белая дамка битая.svg</file>
+        <file>res/Белая дамка.svg</file>
+        <file>res/Черная дамка битая.svg</file>
+        <file>res/Черная дамка.svg</file>
+        <file>res/Шашка 1 битая.svg</file>
+        <file>res/Шашка 1.svg</file>
+        <file>res/Шашка 2 битая.svg</file>
+        <file>res/Шашка 2.svg</file>
+        <file>res/Отметка 2.svg</file>
+        <file>res/select.svg</file>
+    </qresource>
+</RCC>

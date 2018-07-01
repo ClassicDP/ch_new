@@ -1,0 +1,130 @@
+#ifndef VISUALIZE_H
+#define VISUALIZE_H
+
+#include "math.h"
+#include <QLabel>
+#include <QPushButton>
+#include <QImage>
+#include <QGraphicsItem>
+#include <QGraphicsScene>
+#include <QGraphicsPixmapItem>
+#include "game.h"
+
+
+
+class ChVisItem: public QGraphicsPixmapItem
+{
+    QGraphicsScene * scene;
+public:
+    ChVisItem (QGraphicsScene * scene)
+    {
+        this->scene=scene;
+    }
+    void mousePressEvent(QGraphicsSceneMouseEvent *event)
+    {
+        QGraphicsItem * j;
+        foreach (QGraphicsItem * i, scene->items())
+        {
+            if (i==this) j=i;
+        }
+        foreach (QGraphicsItem * i, scene->items())
+        {
+            i->setZValue(0);
+        }
+        j->setZValue(1);
+
+        QGraphicsItem::mousePressEvent(event);
+    }
+};
+
+class checker_vis
+{
+public:
+    ChVisItem * pix;
+    short type;
+    checker_vis(short type, QGraphicsScene * scene)
+    {
+        this->type=type;
+        switch (type) {
+        case Black:
+            pix=new ChVisItem(scene);
+            pix->setPixmap(QPixmap(":/new/prefix1/res/Шашка 1.svg"));
+            break;
+        case White:
+            pix=new ChVisItem(scene);
+            pix->setPixmap(QPixmap(":/new/prefix1/res/Шашка 2.svg"));
+            break;
+        case BlackKing:
+            pix=new ChVisItem(scene);
+            pix->setPixmap(QPixmap(":/new/prefix1/res/Черная дамка.svg"));
+            break;
+        case WhiteKing:
+            pix=new ChVisItem(scene);
+            pix->setPixmap(QPixmap(":/new/prefix1/res/Белая дамка.svg"));
+            break;
+        case KillBlack:
+            pix=new ChVisItem(scene);
+            pix->setPixmap(QPixmap(":/new/prefix1/res/Шашка 1 битая.svg"));
+            break;
+        case KillWhite:
+            pix=new ChVisItem(scene);
+            pix->setPixmap(QPixmap(":/new/prefix1/res/Шашка 2 битая.svg"));
+            break;
+        case KillWhiteKing:
+            pix=new ChVisItem(scene);
+            pix->setPixmap(QPixmap(":/new/prefix1/res/Белая дамка битая.svg"));
+            break;
+        case KillBlackKing:
+            pix=new ChVisItem(scene);
+            pix->setPixmap(QPixmap(":/new/prefix1/res/Черная дамка битая.svg"));
+            break;
+
+        default:
+            break;
+        }
+
+    }
+    ~checker_vis()
+    {
+        delete pix;
+    }
+
+};
+
+class Board
+{
+    QGraphicsScene * scene;
+    int width, height;
+public:
+    Board (QGraphicsScene * scene)
+    {
+        this->scene=scene;
+        scene->setSceneRect(-10,-10,10,10);
+    }
+    void Draw(ItemList <Checker>  CheckersList)
+    {
+
+
+        CheckersList.SetToStart();
+        while (CheckersList.Current())
+        {
+            Checker * ch=CheckersList.Current()->It;
+            checker_vis *chIt=new checker_vis (ch->type,scene);;
+            chIt->pix->setX(50*ch->x);
+            chIt->pix->setY(50*ch->y);
+
+
+//
+            chIt->pix->setScale(0.7);
+            chIt->pix->setFlag(QGraphicsItem::ItemIsMovable);
+            scene->addItem(chIt->pix);
+            CheckersList.Next();
+            scene->setSceneRect(0,0,100,100);
+        }
+    }
+};
+
+
+#endif // VISUALIZE_H
+
+
