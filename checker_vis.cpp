@@ -258,9 +258,12 @@ void CVItem::TrackLoop()
                 ChX->_type=_king;
                 ChX->UpdatePixmap();
             }
-            auto yy=(CVItem *) board->ChSearch(xx->kill);
-            yy->killed=_yes;
-            yy->UpdatePixmap();
+            if (xx->kill>=0)
+            {
+                auto yy=(CVItem *) board->ChSearch(xx->kill);
+                yy->killed=_yes;
+                yy->UpdatePixmap();
+            }
             if (XX->Wait_for_First) {
                 RefreshPoints(top, true);
                 return;
