@@ -81,9 +81,8 @@ public:
     }
 };
 
-struct MoveTreeItem
+struct MoveTreeItem:BaseItem
 {
-    uint8_t PtrCnt=0;
     MoveItem * move;
     ItemsList <MoveTreeItem> * next, *prev;
     MoveTreeItem(MoveItem * move);
@@ -218,18 +217,15 @@ class PTreeMoves
 {
 public:
     ItemsList <MoveTreeItem> * top=new ItemsList <MoveTreeItem>, *saveTop;
-    ItemsList <MoveTreeItem> * movesTrack=new ItemsList <MoveTreeItem>;
+    ItemsList <MoveTreeItem> * track=new ItemsList <MoveTreeItem>;
     ItemsList <MoveTreeItem> * Variants=new ItemsList <MoveTreeItem>;
     ItemsList <MoveItem> * MoveList=new ItemsList <MoveItem>;
-    u_int8_t OldPos=-1;
-    bool FirstStep=true;
-    ItemsList <MoveTreeItem> * MoveVariantsFromPos(uint8_t pos)
+
+    bool Wait_for_First=true;
+    ItemsList <MoveTreeItem> * MoveVariants(uint8_t pos)
     {
-        if (pos==OldPos) return top;
-        OldPos=pos;
-        if (FirstStep)
+        if (Wait_for_First)
         {
-            FirstStep=false;
             top->SetToStart();
             Variants->ClearList();
             while (top->CurrentItem()) {
@@ -237,9 +233,11 @@ public:
                     Variants->AddItem(top->CurrentItem());
                 }
                 top->SetToNext();
-            }
-            top=Variants;
-            if (!top->Count) return NULL;
+            }            
+            if (Variants->Count) {
+                top=Variants;
+                Wait_for_First=false;
+            } else return NULL;
             return top;
         } else
         {
@@ -248,12 +246,14 @@ public:
             {
                 if (top->CurrentItem()->move->to==pos) {
                     top->CurrentItem()->prev=top;
-                    movesTrack->AddItem(top->CurrentItem());
+                    track->AddItem(top->CurrentItem());
                     top=top->CurrentItem()->next;
-                    if (!top->Count) return NULL;
+                    if (!top->Count) {
+                        Wait_for_First=true;
+                        return NULL;
+                    }
                     return top;
                 }
-
                 top->SetToNext();
             }
         }
@@ -262,14 +262,13 @@ public:
 
     void DeleteTrack()
     {
-        OldPos=-1;
-        movesTrack->ClearList();
+        track->ClearList();
         top=saveTop;
         Variants->ClearList();
     }
     ~PTreeMoves()
     {
-        movesTrack->ClearList();
+        track->ClearList();
         top->ClearList();
     }
 
@@ -306,7 +305,7 @@ public:
             MoveList->SetToNext();
         }
         saveTop=top;
-        movesTrack = new ItemsList <MoveTreeItem>;
+        track = new ItemsList <MoveTreeItem>;
     }
 
 

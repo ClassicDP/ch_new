@@ -10,37 +10,7 @@
 #include "game.h"
 #include "itemlist.h"
 
-class ChGrapicsScene;
-
-class CVItem: public QObject, public QGraphicsPixmapItem, public BoardItem
-{
-    Q_OBJECT
-    ChGrapicsScene * scene;
-public:
-
-    ItemsList <MoveTreeItem> * tree=NULL;
-    BoardItem *board_item;
-    bool isField;
-    bool selected;
-    CVItem (BoardItem * board_item, ChGrapicsScene *scene, QPixmap pix);//checker Item
-    CVItem (BoardItem * board_item, ChGrapicsScene *scene);//checker Item
-    CVItem (uint8_t dX, uint8_t dY, ChGrapicsScene *scene);// Field Item
-    ~CVItem()
-    {
-        if (tree) delete tree;
-    }
-    void UpdatePixmap();
-    double dX();
-    double dY();
-    double Xpos(uint8_t _pos);
-    double Ypos(uint8_t _pos);
-    uint8_t Pos();
-public:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-    void TrackLoop();
-};
+enum checker_onboard {_on=0, _off=1};
 
 class Animation:public QObject
 {
@@ -80,8 +50,8 @@ public:
     ~CheckersPixmaps();
 
 };
-class ChGrapicsScene;
 
+class ChGrapicsScene;
 class BoardView : public QGraphicsView
 {
     Q_OBJECT
@@ -90,7 +60,7 @@ public:
     ChGrapicsScene *scene;
     ItemsList <CVItem>  *CheckersList;
     CheckersPixmaps Pixmaps;
-    PTreeMoves *treemoves;
+    PTreeMoves *PTree;
     ItemsList <CVItem> * last_points=new ItemsList <CVItem>;
     Animation * ChAnimation= new Animation;
     uint8_t size;
@@ -108,6 +78,7 @@ public:
     void resizeEvent(QResizeEvent *event);
 
 };
+
 
 class ChGrapicsScene:public QGraphicsScene
 {
@@ -132,8 +103,38 @@ public:
 
 
 
-enum checker_onboard {_on=0, _off=1};
 
+class CVItem: public QObject, public QGraphicsPixmapItem, public BoardItem
+{
+    Q_OBJECT
+    ChGrapicsScene * scene;
+public:
+    BoardView * board;
+    ItemsList <MoveTreeItem> * tree=NULL;
+    BoardItem *brd_it;
+
+    bool isField;
+    bool selected;
+    CVItem (BoardItem * brd_it, ChGrapicsScene *scene, QPixmap pix);//checker Item
+    CVItem (BoardItem * brd_it, ChGrapicsScene *scene);//checker Item
+    CVItem (uint8_t dX, uint8_t dY, ChGrapicsScene *scene);// Field Item
+    ~CVItem()
+    {
+        if (tree) delete tree;
+    }
+    void UpdatePixmap();
+    double dX();
+    double dY();
+    double Xpos(uint8_t _pos);
+    double Ypos(uint8_t _pos);
+    uint8_t Pos();
+public:
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void TrackLoop();
+    void RefreshPoints(ItemsList <MoveTreeItem> * top, bool clear_only=false);
+};
 
 
 #endif

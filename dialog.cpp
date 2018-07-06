@@ -61,7 +61,7 @@ void Dialog::on_pushButton_2_clicked()
     auto tree=PTreeMoves(pList);
     AddToTree(vList, tree.top);
     ui->treeWidget->addTopLevelItems(*vList);
-    board->treemoves= new PTreeMoves(pList);
+    board->PTree= new PTreeMoves(pList);
 }
 
 

@@ -15,8 +15,9 @@ CVItem::CVItem(BoardItem * board_item, ChGrapicsScene *scene, QPixmap pix):Board
 
 {
     isField=false;
-    this->board_item=board_item;
+    this->brd_it=board_item;
     this->scene=scene;
+    board=scene->board;
     setPixmap(pix);
     setScale(scene->fsize/pix.width());
     setPos(dX(),dY());
@@ -27,9 +28,10 @@ CVItem::CVItem(BoardItem * board_item, ChGrapicsScene *scene, QPixmap pix):Board
 CVItem::CVItem(BoardItem *board_item, ChGrapicsScene *scene):BoardItem(*board_item)
 {
     isField=false;
-    this->board_item=board_item;
+    this->brd_it=board_item;
     this->scene=scene;
-    auto pix=scene->board->Pixmaps.pix(_color,_type, killed);
+    board=scene->board;
+    auto pix=board->Pixmaps.pix(_color,_type, killed);
     setPixmap(pix);
     setScale(scene->fsize/pix.width());
     setPos(dX(),dY());
@@ -41,12 +43,15 @@ CVItem::CVItem(uint8_t X, uint8_t Y, ChGrapicsScene *scene):BoardItem(X,Y, scene
 {
     isField=true;
     this->scene=scene;
+    board=scene->board;
 }
 
 void CVItem::UpdatePixmap()
 {
-    CheckersPixmaps Pix;
-    setPixmap(Pix.pixmaps[_color][_type][killed]);
+    auto pix=board->Pixmaps.pix(_color,_type, killed);
+    setPixmap(pix);
+    setScale(scene->fsize/pix.width());
+    setPos(dX(),dY());
 }
 
 
@@ -89,16 +94,16 @@ void CVItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
         if (!this->isField)
         {
-            auto * i=scene->board->ChSearch(_pos);
+            auto * i=board->ChSearch(_pos);
             if (i)
             {
                 int x=_color+2*_type;
                 x++;
                 if (x==4)
                 {
-                    auto xx=scene->board->CheckersList->searchIt(i);
+                    auto xx=board->CheckersList->searchIt(i);
                     scene->removeItem(xx->It);
-                    scene->board->CheckersList->DeleteLate(xx);
+                    board->CheckersList->DeleteLate(xx);
                 } else
                 {
                     if (x&1) i->_color=_white;
@@ -107,18 +112,17 @@ void CVItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
                     else i->_type=_simple;
                     i->UpdatePixmap();
                 }
-                scene->board->Draw();
             }
         } else if (!((_X()+_Y())%2))
         {
-            auto chL = scene->board->CheckersList;
+            auto chL = board->CheckersList;
             bool res=false;
             for (int i=0;i<chL->Count;i++) res|=(chL->At(i)->It->_X()==_X()) && (chL->At(i)->It->_Y()==_Y());
             if (!res)
             {
-                scene->board->CheckersList->AddItem(new CVItem(
-                                                        new BoardItem(_black,_simple,_X(),_Y(), scene->size),scene));
-                scene->addItem(scene->board->CheckersList->Last->It);
+                board->CheckersList->
+                        AddItem(new CVItem(new BoardItem(_black,_simple,_X(),_Y(), scene->size),scene));
+                scene->addItem(board->CheckersList->Last->It);
             }
         }
         return;
@@ -139,8 +143,8 @@ void CVItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     return;
     if (scene->params->IsEdit) return;
     // in Board check
-    double dx=mapToScene(event->pos()).x()-scene->board->ChAnimation->mxPos+dX();
-    double dy=mapToScene(event->pos()).y()-scene->board->ChAnimation->myPos+dY();
+    double dx=mapToScene(event->pos()).x()-board->ChAnimation->mxPos+dX();
+    double dy=mapToScene(event->pos()).y()-board->ChAnimation->myPos+dY();
     dx=dx<0?0:dx;dx=dx>scene->sq-scene->fsize?scene->sq-scene->fsize:dx;
     dy=dy<0?0:dy;dy=dy>scene->sq-scene->fsize?scene->sq-scene->fsize:dy;
     setPos(dx,dy);
@@ -149,60 +153,120 @@ void CVItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
     //QGraphicsItem::mouseMoveEvent(event);
 }
+//void CVItem::TrackLoop()
+//{
+//    if (board->ChAnimation->busy) return;
+//    int trkcnt;
+//    ItemsList <MoveTreeItem> * treeTop;
+//    do
+//    {
+//        if (board->PTree->track) trkcnt=board->PTree->track->Count;
+//        else trkcnt=0;
+//        treeTop=board->PTree->MoveVariants(_pos);
+//        if (!(trkcnt<board->PTree->track->Count) &&
+//                (board->last_points->Count==1)) treeTop=scene->board
+//                ->PTree->MoveVariants(board->last_points->First->It->Pos());
+
+//        if (treeTop)
+//        {
+//            board->last_points->SetToStart();
+//            while (board->last_points->Curr)
+//            {
+//                scene->removeItem(board->last_points->CurrentItem());
+//                board->last_points->SetToNext();
+//            }
+//            board->last_points->ClearLate();
+//            treeTop->SetToStart();
+//            while (treeTop->Curr)
+//            {
+//                board->last_points->
+//                AddItem(board->SetPoint(treeTop->CurrentItem()->move->to));
+//                treeTop->SetToNext();
+//            }
+//        }
+
+//        if (trkcnt<board->PTree->track->Count)
+//        {
+//            auto xx=board->PTree->track->Last->It->move;
+//            auto ChX=board->ChSearch(xx->from);
+//            foreach (QGraphicsItem * i, scene->items())
+//            {
+//                i->setZValue(0);
+//            }
+//            ChX->setZValue(1);
+//            board->ChAnimation->LineMoveAnimation
+//                    (ChX,ChX->Xpos(xx->to), ChX->Ypos(xx->to), 100, 700);
+//            qDebug () << "animation start"<< ChX->_X() << ChX->_Y();
+//            ChX->_pos=xx->to;
+//            if (is_king(ChX->_color, scene->board, xx->to))
+//            {
+//                ChX->_type=_king;
+//                ChX->UpdatePixmap();
+//            }
+//            auto yy=(CVItem *) board->ChSearch(xx->kill);
+//            yy->killed=_yes;
+//            yy->UpdatePixmap();
+//        }
+
+//    } while (treeTop && (trkcnt<board->PTree->track->Count
+//             || (board->last_points->Count==1)));
+//}
+void CVItem::RefreshPoints(ItemsList <MoveTreeItem> * top, bool clear_only)
+{
+    board->last_points->SetToStart();
+    while (board->last_points->Curr)
+    {
+        scene->removeItem(board->last_points->CurrentItem());
+        board->last_points->SetToNext();
+    }
+    board->last_points->ClearLate();
+    if (!clear_only)
+    {
+        top->SetToStart();
+        while (top->Curr)
+        {
+            board->last_points->
+                    AddItem(board->SetPoint(top->CurrentItem()->move->to));
+            top->SetToNext();
+        }
+    }
+}
 void CVItem::TrackLoop()
 {
-    if (scene->board->ChAnimation->busy) return;
+    if (board->ChAnimation->busy) return;
     int trkcnt;
-    if (scene->board->treemoves->movesTrack)
-        trkcnt=scene->board->treemoves->movesTrack->Count;
-    else trkcnt=0;
-    ItemsList <MoveTreeItem> * treeTop;
-    treeTop=scene->board->treemoves->
-            MoveVariantsFromPos(_pos);
-    if (treeTop)
+    ItemsList <MoveTreeItem> * top; auto XX=board->PTree;
+    do
     {
-        treeTop->SetToStart();
-        while (treeTop->Curr)
+        trkcnt=XX->track->Count;
+        if (board->last_points->Count==1)
+            top=XX->MoveVariants(board->last_points->Last->It->_pos); else
+            top=XX->MoveVariants(_pos);
+        if (top && top->Count) RefreshPoints(top);
+        if (trkcnt<XX->track->Count)
         {
-            scene->board->last_points->
-                    AddItem(scene->board->SetPoint(treeTop->CurrentItem()->move->to));
-            treeTop->SetToNext();
+            auto xx=XX->track->Last->It->move;
+            auto ChX=board->ChSearch(xx->from);
+            foreach (QGraphicsItem * i, scene->items()) i->setZValue(0);
+            ChX->setZValue(1);
+            board->ChAnimation->LineMoveAnimation
+                    (ChX,ChX->Xpos(xx->to), ChX->Ypos(xx->to), 100, 700);
+//            qDebug () << "animation start"<< ChX->_X() << ChX->_Y();
+            ChX->_pos=xx->to;
+            if (is_king(ChX->_color, scene->board, xx->to))
+            {
+                ChX->_type=_king;
+                ChX->UpdatePixmap();
+            }
+            auto yy=(CVItem *) board->ChSearch(xx->kill);
+            yy->killed=_yes;
+            yy->UpdatePixmap();
+            if (XX->Wait_for_First) {
+                RefreshPoints(top, true);
+                return;
+            }
         }
-    }
-    if (!(trkcnt<scene->board->treemoves->movesTrack->Count) &&
-            (scene->board->last_points->Count==1)) treeTop=scene->board
-            ->treemoves->MoveVariantsFromPos(scene->board->last_points->First->It->Pos());
-    if (trkcnt<scene->board->treemoves->movesTrack->Count)
-    {
-        scene->board->last_points->SetToStart();
-        while (scene->board->last_points->Curr)
-        {
-            scene->removeItem(scene->board->last_points->CurrentItem());
-            scene->board->last_points->SetToNext();
-        }
-        scene->board->last_points->ClearLate();
-
-        auto xx=scene->board->treemoves->movesTrack->Last->It->move;
-        auto ChX= scene->board->ChSearch(xx->from);
-        scene->board->ChAnimation->LineMoveAnimation
-                (ChX,ChX->Xpos(xx->to), ChX->Ypos(xx->to), 100, 700);
-        qDebug () << "animation start"<< ChX->_X() << ChX->_Y();
-        ChX->_pos=xx->to;
-        if (is_king(ChX->_color, scene->board, xx->to))
-        {
-            ChX->_type=_king;
-            ChX->UpdatePixmap();
-        }
-        auto yy=(CVItem *) scene->board->ChSearch(xx->kill);
-        yy->killed=_yes;
-        yy->UpdatePixmap();
-        foreach (QGraphicsItem * i, scene->items())
-        {
-            i->setZValue(0);
-        }
-        ChX->setZValue(1);
-    }
-
+    } while (board->last_points->Count==1);
 }
 
 

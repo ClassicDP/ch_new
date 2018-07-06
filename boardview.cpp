@@ -11,7 +11,7 @@ void Animation::Next()
     qDebug() << Ch->_X()<< Ch->_Y() << "finished!";
     delete timeLine;
     busy=false;
-    Ch->TrackLoop();
+    _loop.exit();
 }
 
 
@@ -32,6 +32,7 @@ void Animation::LineMoveAnimation(CVItem *Ch, int xPos, int yPos, int StepCount,
     connect(timeLine, SIGNAL(finished()),this,SLOT(Next()));
     busy=true;
     timeLine->start();
+    _loop.exec();
 }
 void Animation::TrcNext()
 {
@@ -99,7 +100,7 @@ void BoardView::Draw()
 {
     foreach (auto it, scene->items()) {
         scene->removeItem(it);
-        ((CVItem *) (it))->deleteLater();
+        if (!((CVItem *) (it))->PtrCnt) ((CVItem *) (it))->deleteLater();
     }
     double height=this->height();
     double width=this->width();
@@ -133,6 +134,7 @@ void BoardView::Draw()
     while (CheckersList->CurrentItem())
     {
         auto * ch=CheckersList->CurrentItem();
+        ch->UpdatePixmap();
         scene->addItem(ch);
         CheckersList->SetToNext();
     }
