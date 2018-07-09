@@ -43,21 +43,21 @@ void Animation::TrcNext()
 void Animation::TrackMoveAnimation(CVItem *Ch, int xPos, int yPos, int StepCount, int mSec)
 {
 
-        this->xPos=xPos;
-        this->yPos=yPos;
-        dx=Ch->pos().x();
-        dy=Ch->pos().y();
-        dx=-(xPos-dx)/StepCount;
-        dy=-(yPos-dy)/StepCount;
-        this->Ch=Ch;
-        timeLine=new QTimeLine(mSec);
-        timeLine->setFrameRange(0,StepCount);
-        timeLine->setDirection(QTimeLine::Backward);
-        connect(timeLine, SIGNAL( frameChanged(int)), this, SLOT(Pos(int)));
-        connect(timeLine, SIGNAL(finished()),this,SLOT(TrcNext()));
-        busy=true;
-        timeLine->start();
-        _loop.exec();
+    this->xPos=xPos;
+    this->yPos=yPos;
+    dx=Ch->x();
+    dy=Ch->y();
+    dx=-(xPos-dx)/StepCount;
+    dy=-(yPos-dy)/StepCount;
+    this->Ch=Ch;
+    timeLine=new QTimeLine(mSec);
+    timeLine->setFrameRange(0,StepCount);
+    timeLine->setDirection(QTimeLine::Backward);
+    connect(timeLine, SIGNAL( frameChanged(int)), this, SLOT(Pos(int)));
+    connect(timeLine, SIGNAL(finished()),this,SLOT(TrcNext()));
+    busy=true;
+    timeLine->start();
+    _loop.exec();
 }
 
 void Animation::TrackAnimation(CVItem *Ch, ItemsList<MoveTreeItem> *movesTrack, int8_t from, int8_t cnt)
@@ -94,21 +94,42 @@ BoardView::BoardView(QWidget *parent, uint8_t size, gameparams *params, ItemsLis
 BoardView::~BoardView()
 {
 }
-
+#include <math.h>
 void BoardView::Draw()
 
 {
     foreach (auto it, scene->items()) {
         scene->removeItem(it);
-        if (!((CVItem *) (it))->PtrCnt) ((CVItem *) (it))->deleteLater();
+        ((QObject *) (it))->deleteLater();
     }
     double height=this->height();
     double width=this->width();
+    height=std::min(height,width);
+    height=height-2*height/size/3;
+    width=height;
     scene->SetParams(width,height,size);
-
-    scene->setSceneRect(0,0,width,height);
+    fW=scene->fsize/3;
+    qDebug() << frameSize() << scene->fsize<< fW;
+    scene->setSceneRect(-fW,-fW,width+2*fW,height+2*fW);
+    QBrush brush(0xE7CBAB);
+    scene->addRect(-fW, -fW, width+2*fW, height+2*fW, QPen(0xE7CBAB), brush);
+    QPen pen(0x45413D);
+    pen.setWidth(2);
+    scene->addRect(-1, -1, width+2, height+2, pen);
+    pen.setWidth(1);
     for (int i=0;i<size;i++)
     {
+        QGraphicsTextItem *txt;
+        txt=scene->addText(QString('0'+((white_down)?(size-i):(i+1))));
+        txt->setPos(-fW,(i+0.3)*scene->fsize);
+        txt =scene->addText(QString('0'+((white_down)?(size-i):(i+1))));
+        txt->setPos(width,(i+0.3)*scene->fsize);
+        txt =scene->addText(QString('A'+((white_down)?i:(size-i-1))));
+        txt->setPos((i+0.3)*scene->fsize, -fW*1.3);
+        txt =scene->addText(QString('A'+((white_down)?i:(size-i-1))));
+
+        txt->setPos((i+0.3)*scene->fsize, height-fW*0.2);
+
         for (int j=0;j<size;j++)
         {
             if ((i+j)%2)
@@ -162,7 +183,7 @@ CVItem * BoardView::SetSelected(uint8_t pos)
     CVItem * field=new CVItem(i,j,scene);
     field->setPixmap(*Pixmaps.PM_selectedFeild);
     field->setScale(scene->fsize/field->pixmap().width());
-    field->setPos(scene->xy2pos(i,j));
+    field->setPos(scene->xy2pos(i,j).x(), scene->xy2pos(i,j).y());
     scene->addItem(field);
     return field;
 }

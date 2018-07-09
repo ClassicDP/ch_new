@@ -58,14 +58,14 @@ class BoardView : public QGraphicsView
 
 public:
     ChGrapicsScene *scene;
+    uint8_t fW;// frame width
+    bool white_down=false;
     ItemsList <CVItem>  *CheckersList;
     CheckersPixmaps Pixmaps;
     PTreeMoves *PTree;
     ItemsList <CVItem> * last_points=new ItemsList <CVItem>;
     Animation * ChAnimation= new Animation;
     uint8_t size;
-
-
     explicit BoardView(QWidget *parent = 0,  uint8_t size=8, gameparams * params=NULL, ItemsList<CVItem> *CheckersList=NULL);
     ~BoardView();
     void Draw();
@@ -74,9 +74,7 @@ public:
     CVItem *SetSelected(uint8_t pos);
     void DeleteSelected(CVItem *item);
     CVItem *ChSearch(uint8_t pos);
-
     void resizeEvent(QResizeEvent *event);
-
 };
 
 
@@ -118,6 +116,8 @@ public:
     CVItem (BoardItem * brd_it, ChGrapicsScene *scene, QPixmap pix);//checker Item
     CVItem (BoardItem * brd_it, ChGrapicsScene *scene);//checker Item
     CVItem (uint8_t dX, uint8_t dY, ChGrapicsScene *scene);// Field Item
+    void setPos(qreal x, qreal y);
+    QPointF pos();
     ~CVItem()
     {
         if (tree) delete tree;
