@@ -35,8 +35,8 @@ public:
         b_size(b_size)
     {
         _pos=y*b_size+x;
-        this->_color=color;
-        this->_type=type;
+        _color=color;
+        _type=type;
     }
     BoardItem (uint8_t x, uint8_t y, uint8_t b_size):
         b_size(b_size)
@@ -83,10 +83,16 @@ public:
 
 struct MoveTreeItem:BaseItem
 {
-    MoveItem * move;
+    MoveItem * move=NULL;
     ItemsList <MoveTreeItem> * next, *prev;
     MoveTreeItem(MoveItem * move);
     QString toString(uint8_t Size=8);
+    ~MoveTreeItem()
+    {
+//        if (move && !move->PtrCnt) {delete move;move=NULL;};
+//        next->ClearList();
+//        prev->ClearList();
+    }
 
 };
 
@@ -224,6 +230,19 @@ public:
     bool Wait_for_First=true;
     ItemsList <MoveTreeItem> * MoveVariants(uint8_t pos)
     {
+        if (!track->Count)
+        {
+            saveTop->SetToStart();
+            while (saveTop->Curr) {
+                if (saveTop->CurrentItem()->move->from==pos)
+                {
+                    top=saveTop;
+                    Wait_for_First=true;
+                    break;
+                }
+                saveTop->SetToNext();
+            }
+        }
         if (Wait_for_First)
         {
             top->SetToStart();
@@ -233,7 +252,7 @@ public:
                     Variants->AddItem(top->CurrentItem());
                 }
                 top->SetToNext();
-            }            
+            }
             if (Variants->Count) {
                 top=Variants;
                 Wait_for_First=false;
@@ -312,15 +331,38 @@ public:
 };
 
 
-
 class Game
 {
 public:
     ItemsList <CVItem> * CheckersList;
-    short int Size;
-    Game()
+    bool IsEdit=true;
+    ItemsList <Position> * pList;
+    Position * Pos;
+    checker_color next_move_clr;
+    uint8_t _size;
+    GameFunctions * funct;
+    Game(uint8_t size)
     {
+        funct= new GameFunctions(size);
         CheckersList=new ItemsList <CVItem>;
+        next_move_clr=_white;
+        _size=size;
+        Pos = new Position (_size, CheckersList, next_move_clr);
+        pList=new ItemsList <Position>;
+    }
+    void next_move_list()
+    {
+        delete Pos;
+        next_move_clr=reverse(next_move_clr);
+        Pos= new Position(_size, CheckersList, next_move_clr);
+        funct->MakeMovesList(Pos, pList);
+    }
+    ~Game()
+    {
+        delete CheckersList;
+        delete Pos;
+        delete pList;
+        delete funct;
     }
 
 };

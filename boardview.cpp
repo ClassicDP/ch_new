@@ -80,13 +80,13 @@ void Animation::TrackAnimation(CVItem *Ch, ItemsList<MoveTreeItem> *movesTrack, 
     }
 }
 
-BoardView::BoardView(QWidget *parent, uint8_t size, gameparams *params, ItemsList<CVItem> *CheckersList)
+BoardView::BoardView(QWidget *parent, uint8_t size, Game *game, ItemsList<CVItem> *CheckersList)
 {
     this->CheckersList=CheckersList;
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scene=new ChGrapicsScene (this);
-    scene->params=params;
+    scene->game=game;
     this->setScene(scene);
     this->size=size;
 }
@@ -207,6 +207,19 @@ CVItem *BoardView::ChSearch(uint8_t pos)
 void BoardView::resizeEvent(QResizeEvent *event)
 {
     Draw();
+}
+
+void BoardView::start_pos()
+{
+    CheckersList->ClearLate();
+    int rows=size/2;
+    for (int i=0;i<size;i++)
+        for (int j=0;j<size;j++)
+        {
+            if ((i+j)%2) continue;
+            if (i<(rows-1)) CheckersList->AddItem(new CVItem(new BoardItem (_white,_simple,j,i,size),scene));
+            if (i>rows) CheckersList->AddItem(new CVItem(new BoardItem (_black,_simple,j,i,size),scene));
+        }
 }
 
 

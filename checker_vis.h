@@ -33,10 +33,6 @@ public slots:
     void TrcNext();
 };
 
-struct gameparams
-{
-    bool IsEdit=true;
-};
 
 class CheckersPixmaps
 {
@@ -59,14 +55,14 @@ class BoardView : public QGraphicsView
 public:
     ChGrapicsScene *scene;
     uint8_t fW;// frame width
-    bool white_down=false;
+    bool white_down=true;
     ItemsList <CVItem>  *CheckersList;
     CheckersPixmaps Pixmaps;
     PTreeMoves *PTree;
     ItemsList <CVItem> * last_points=new ItemsList <CVItem>;
     Animation * ChAnimation= new Animation;
     uint8_t size;
-    explicit BoardView(QWidget *parent = 0,  uint8_t size=8, gameparams * params=NULL, ItemsList<CVItem> *CheckersList=NULL);
+    explicit BoardView(QWidget *parent = 0,  uint8_t size=8, Game * game=NULL, ItemsList<CVItem> *CheckersList=NULL);
     ~BoardView();
     void Draw();
     CVItem *SetPoint(uint8_t pos);
@@ -75,13 +71,14 @@ public:
     void DeleteSelected(CVItem *item);
     CVItem *ChSearch(uint8_t pos);
     void resizeEvent(QResizeEvent *event);
+    void start_pos();
 };
 
 
 class ChGrapicsScene:public QGraphicsScene
 {
 public:
-    gameparams * params;
+    Game * game;
     BoardView * board;
     uint8_t size;
     double w,h,t,l;
@@ -93,13 +90,8 @@ public:
 
     }
     void SetParams (double w, double h, uint8_t size, double t=0, double l=0);
-    ~ ChGrapicsScene()
-    {
 
-    }
 };
-
-
 
 
 class CVItem: public QObject, public QGraphicsPixmapItem, public BoardItem
@@ -110,7 +102,6 @@ public:
     BoardView * board;
     ItemsList <MoveTreeItem> * tree=NULL;
     BoardItem *brd_it;
-
     bool isField;
     bool selected;
     CVItem (BoardItem * brd_it, ChGrapicsScene *scene, QPixmap pix);//checker Item

@@ -111,7 +111,7 @@ inline bool is_king(checker_color clr, BoardView *brd,uint8_t x)
 
 void CVItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (scene->params->IsEdit)
+    if (scene->game->IsEdit)
     {
         if (!this->isField)
         {
@@ -162,7 +162,7 @@ void CVItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void CVItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     return;
-    if (scene->params->IsEdit) return;
+    if (scene->game->IsEdit) return;
     // in Board check
     double dx=mapToScene(event->pos()).x()-board->ChAnimation->mxPos+dX();
     double dy=mapToScene(event->pos()).y()-board->ChAnimation->myPos+dY();

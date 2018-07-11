@@ -4,7 +4,7 @@
 #include "game.h"
 #include <QGraphicsPixmapItem>
 #include <QTreeWidgetItem>
-
+ #define _size 8
 QGraphicsPixmapItem * px;
 
 Dialog::Dialog(QWidget *parent) :
@@ -13,8 +13,8 @@ Dialog::Dialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    this->game = new Game();
-    board=new BoardView(parent, 8, &this->gameparam,game->CheckersList);
+    game = new Game(_size);
+    board=new BoardView(parent, _size, game, game->CheckersList);
     ui->Layout->addWidget(board);
     board->Draw();
 }
@@ -27,8 +27,17 @@ Dialog::~Dialog()
 
 void Dialog::on_pushButton_clicked()
 {
-    gameparam.IsEdit^=1;
-    if (gameparam.IsEdit) ui->pushButton->setText("Редактор"); else ui->pushButton->setText("Игра");
+    game->IsEdit^=1;
+    if (game->IsEdit)
+    {
+        ui->pushButton->setText("Редактор");
+        ui->pushButton_3->setText("Начальная");
+    }
+    else
+    {
+        ui->pushButton->setText("Игра");
+        ui->pushButton_3->setText("Повернуть доску");
+    }
 }
 
 void AddToTree (QList<QTreeWidgetItem*> *vList, ItemsList <MoveTreeItem> * tree)
@@ -36,7 +45,7 @@ void AddToTree (QList<QTreeWidgetItem*> *vList, ItemsList <MoveTreeItem> * tree)
     tree->SetToStart();
     while (tree->CurrentItem()) {
         QTreeWidgetItem *it=new QTreeWidgetItem;
-        it->setText(0,tree->CurrentItem()->toString(8));
+        it->setText(0,tree->CurrentItem()->toString(_size));
         vList->append(it);
         QList<QTreeWidgetItem*> *yy=new QList<QTreeWidgetItem*>;
         AddToTree(yy,tree->CurrentItem()->next);
@@ -47,21 +56,34 @@ void AddToTree (QList<QTreeWidgetItem*> *vList, ItemsList <MoveTreeItem> * tree)
 
 void Dialog::on_pushButton_2_clicked()
 {
-    pos = new Position (board->size,board->CheckersList,_white);
-    GameFunctions gF(board->size);
-    ItemsList <Position> * pList=new ItemsList <Position>;
-    gF.MakeMovesList(pos, pList);
-    pList->SetToStart();
-    while (pList->CurrentItem())
+    ui->listWidget->clear();
+    game->next_move_list();
+    game->pList->SetToStart();
+    while (game->pList->CurrentItem())
     {
-        ui->listWidget->addItem(pList->CurrentItem()->MoveAsStr());
-        pList->SetToNext();
+        ui->listWidget->addItem(game->pList->CurrentItem()->MoveAsStr());
+        game->pList->SetToNext();
     }
     QList<QTreeWidgetItem*> *vList=new QList<QTreeWidgetItem*>;
-    auto tree=PTreeMoves(pList);
+    auto tree=PTreeMoves(game->pList);
     AddToTree(vList, tree.top);
+    ui->treeWidget->clear();
     ui->treeWidget->addTopLevelItems(*vList);
-    board->PTree= new PTreeMoves(pList);
+    board->PTree= new PTreeMoves(game->pList);
 }
 
 
+
+void Dialog::on_pushButton_3_clicked()
+{
+    if (game->IsEdit)
+    {
+        board->start_pos();
+        board->Draw();
+    }
+    else
+    {
+        board->white_down^=1;
+        board->Draw();
+    }
+}
