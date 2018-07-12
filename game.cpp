@@ -1,6 +1,8 @@
 #include "game.h"
 #include "checker_vis.h"
-
+#include <QDebug>
+#include <QGraphicsPixmapItem>
+#include <QTreeWidgetItem>
 
 
 //not optimised in king steps after killing
@@ -28,6 +30,7 @@ bool GameFunctions::TryToKill(Position *ps, ItemsList<Position> *PosList, MoveIt
             if (!isOnBoard(x2) || ps->board[x2]) break;
             if (!ps->board[x2]) {
                 //kill posible!
+                qDebug() << x2 << ps->board[x2];
                 res=true;
                 auto type= chIt->_type;//save status before check for revers
                 //check for simple revers to king by move
@@ -169,11 +172,67 @@ Position::Position(uint8_t Size, ItemsList<CVItem> *CheckersList, checker_color 
     CheckersList->SetToStart();
     while (CheckersList->CurrentItem())
     {
-        Ch * ch=new Ch;
-        ch->_pos=CheckersList->CurrentItem()->_Y()*Size+CheckersList->CurrentItem()->_X();
-        ch->_type=CheckersList->CurrentItem()->_type;
-        ch->_color=CheckersList->CurrentItem()->_color;
-        board[ch->_pos]=ChList[CheckersList->CurrentItem()->_color]->AddItem(ch);
+        Ch * ch=CheckersList->CurrentItem();
+//        ch->_pos=CheckersList->CurrentItem()->_Y()*Size+CheckersList->CurrentItem()->_X();
+//        ch->_type=CheckersList->CurrentItem()->_type;
+//        ch->_color=CheckersList->CurrentItem()->_color;
+        board[ch->_pos]=ChList[ch->_color]->AddItem(ch);
         CheckersList->SetToNext();
+    }
+}
+
+Game::Game(uint8_t size)
+{
+    funct= new GameFunctions(size);
+    CheckersList=new ItemsList <CVItem>;
+    next_move_clr=_white;
+    _size=size;
+    Pos = new Position (_size, CheckersList, next_move_clr);
+    pList=new ItemsList <Position>;
+}
+
+void Game::next_move_list(Ui_Dialog *ui)
+{
+    delete Pos;
+    Pos= new Position(_size, CheckersList, next_move_clr);
+    pList->ClearList();
+    funct->MakeMovesList(Pos, pList);
+    next_move_clr=reverse(next_move_clr);
+
+    pList->SetToStart();
+    ui->listWidget->clear();
+    while (pList->CurrentItem())
+    {
+        ui->listWidget->addItem(pList->CurrentItem()->MoveAsStr());
+        pList->SetToNext();
+    }
+    QList<QTreeWidgetItem*> *vList=new QList<QTreeWidgetItem*>;
+    auto tree=PTreeMoves(pList);
+    AddToTree(vList, tree.top, board->size);
+    ui->treeWidget->clear();
+    ui->treeWidget->addTopLevelItems(*vList);
+    board->PTree= new PTreeMoves(pList);
+
+}
+
+Game::~Game()
+{
+    delete CheckersList;
+    delete Pos;
+    delete pList;
+    delete funct;
+}
+
+void AddToTree(QList<QTreeWidgetItem *> *vList, ItemsList<MoveTreeItem> *tree, uint8_t _size)
+{
+    tree->SetToStart();
+    while (tree->CurrentItem()) {
+        QTreeWidgetItem *it=new QTreeWidgetItem;
+        it->setText(0,tree->CurrentItem()->toString(_size));
+        vList->append(it);
+        QList<QTreeWidgetItem*> *yy=new QList<QTreeWidgetItem*>;
+        AddToTree(yy,tree->CurrentItem()->next, _size);
+        it->addChildren(*yy);
+        tree->SetToNext();
     }
 }

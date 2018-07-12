@@ -2,9 +2,9 @@
 #include "ui_dialog.h"
 #include "checker_vis.h"
 #include "game.h"
-#include <QGraphicsPixmapItem>
-#include <QTreeWidgetItem>
- #define _size 8
+
+#define _size 8
+
 QGraphicsPixmapItem * px;
 
 Dialog::Dialog(QWidget *parent) :
@@ -12,11 +12,12 @@ Dialog::Dialog(QWidget *parent) :
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
-
     game = new Game(_size);
     board=new BoardView(parent, _size, game, game->CheckersList);
+    game->board=board;
     ui->Layout->addWidget(board);
     board->Draw();
+
 }
 
 
@@ -40,36 +41,10 @@ void Dialog::on_pushButton_clicked()
     }
 }
 
-void AddToTree (QList<QTreeWidgetItem*> *vList, ItemsList <MoveTreeItem> * tree)
-{
-    tree->SetToStart();
-    while (tree->CurrentItem()) {
-        QTreeWidgetItem *it=new QTreeWidgetItem;
-        it->setText(0,tree->CurrentItem()->toString(_size));
-        vList->append(it);
-        QList<QTreeWidgetItem*> *yy=new QList<QTreeWidgetItem*>;
-        AddToTree(yy,tree->CurrentItem()->next);
-        it->addChildren(*yy);
-        tree->SetToNext();
-    }
-}
 
 void Dialog::on_pushButton_2_clicked()
 {
-    ui->listWidget->clear();
-    game->next_move_list();
-    game->pList->SetToStart();
-    while (game->pList->CurrentItem())
-    {
-        ui->listWidget->addItem(game->pList->CurrentItem()->MoveAsStr());
-        game->pList->SetToNext();
-    }
-    QList<QTreeWidgetItem*> *vList=new QList<QTreeWidgetItem*>;
-    auto tree=PTreeMoves(game->pList);
-    AddToTree(vList, tree.top);
-    ui->treeWidget->clear();
-    ui->treeWidget->addTopLevelItems(*vList);
-    board->PTree= new PTreeMoves(game->pList);
+    game->next_move_list(ui);
 }
 
 

@@ -197,6 +197,7 @@ void CVItem::RefreshPoints(ItemsList <MoveTreeItem> * top, bool clear_only)
 }
 void CVItem::TrackLoop()
 {
+
     if (board->ChAnimation->busy) return;
     int trkcnt;
     ItemsList <MoveTreeItem> * top; auto XX=board->PTree;
@@ -225,11 +226,21 @@ void CVItem::TrackLoop()
             if (xx->kill>=0)
             {
                 auto yy=(CVItem *) board->ChSearch(xx->kill);
+                XX->to_delete->AddItem(yy);
                 yy->killed=_yes;
+
                 yy->UpdatePixmap();
             }
             if (XX->Wait_for_First) {
                 RefreshPoints(top, true);
+                XX->to_delete->SetToStart();
+                while (XX->to_delete->Curr)
+                {
+                    board->CheckersList->
+                     Delete(board->CheckersList->searchIt(XX->to_delete->CurrentItem()));
+                    XX->to_delete->SetToNext();
+                    board->Draw();
+                }
                 return;
             }
         }

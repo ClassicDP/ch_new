@@ -4,6 +4,8 @@
 
 #include <stdint.h>
 #include <qstring.h>
+#include "ui_dialog.h"
+
 
 
 
@@ -62,7 +64,7 @@ class MoveItem
 {
 public:
     uint PtrCnt=0;//the number of pointers to this object
-    MoveItem * conn;//chain connection
+    MoveItem * conn=NULL;//chain connection
     uint8_t from, to;
     int8_t kill;
     MoveItem(MoveItem * conn, u_int8_t from, u_int8_t to, u_int8_t kill=-1):conn(conn),from(from),to(to),kill(kill)
@@ -72,8 +74,7 @@ public:
     }
     ~MoveItem()
     {
-        if (conn && conn->PtrCnt)
-            if (!(--conn->PtrCnt)) delete conn;
+        //        if (conn) {delete conn; conn=NULL;}
     }
     inline bool operator ==(const MoveItem &move)
     {
@@ -84,14 +85,13 @@ public:
 struct MoveTreeItem:BaseItem
 {
     MoveItem * move=NULL;
-    ItemsList <MoveTreeItem> * next, *prev;
+    ItemsList <MoveTreeItem> * next;
     MoveTreeItem(MoveItem * move);
     QString toString(uint8_t Size=8);
     ~MoveTreeItem()
     {
-//        if (move && !move->PtrCnt) {delete move;move=NULL;};
-//        next->ClearList();
-//        prev->ClearList();
+        if (move && !move->PtrCnt) {delete move;move=NULL;}
+        delete next;
     }
 
 };
@@ -116,7 +116,7 @@ public:
     uint8_t Size, len;//len of board array
     checker_color ClrOfMove;//color of next move
     ItemsList <Ch> *ChList[2];//checkers on board
-    MoveItem * move;//Move track (chain to back);
+    MoveItem * move=NULL;//Move track (chain to back);
     Position (uint8_t Size, ItemsList <CVItem> * CheckersList, checker_color nextMoveColor);
     Position (Position * pos)//copy of object
     {
@@ -176,6 +176,10 @@ public:
         delete board;
         if (ChList[0]) delete ChList[0];
         if (ChList[1]) delete ChList[1];
+        if (move)
+        {
+            delete move;
+        }
         // !!!        while (track) {auto tmp=track;track=track->prev;delete tmp;}
     }
 };
@@ -222,11 +226,11 @@ public:
 class PTreeMoves
 {
 public:
-    ItemsList <MoveTreeItem> * top=new ItemsList <MoveTreeItem>, *saveTop;
+    ItemsList <MoveTreeItem> * top=new ItemsList <MoveTreeItem>, *saveTop=NULL;
     ItemsList <MoveTreeItem> * track=new ItemsList <MoveTreeItem>;
     ItemsList <MoveTreeItem> * Variants=new ItemsList <MoveTreeItem>;
     ItemsList <MoveItem> * MoveList=new ItemsList <MoveItem>;
-
+    ItemsList <CVItem> * to_delete= new ItemsList <CVItem>;
     bool Wait_for_First=true;
     ItemsList <MoveTreeItem> * MoveVariants(uint8_t pos)
     {
@@ -245,6 +249,7 @@ public:
         }
         if (Wait_for_First)
         {
+            to_delete->ClearList();
             top->SetToStart();
             Variants->ClearList();
             while (top->CurrentItem()) {
@@ -264,7 +269,7 @@ public:
             while (top->Curr)
             {
                 if (top->CurrentItem()->move->to==pos) {
-                    top->CurrentItem()->prev=top;
+                    //top->CurrentItem()->prev=top;
                     track->AddItem(top->CurrentItem());
                     top=top->CurrentItem()->next;
                     if (!top->Count) {
@@ -287,8 +292,11 @@ public:
     }
     ~PTreeMoves()
     {
-        track->ClearList();
-        top->ClearList();
+        delete track;
+        delete top;
+        delete Variants;
+        delete MoveList;
+        delete to_delete;
     }
 
     PTreeMoves(ItemsList<Position> *pList)
@@ -330,7 +338,9 @@ public:
 
 };
 
+void AddToTree (QList<QTreeWidgetItem*> *vList, ItemsList <MoveTreeItem> * tree, uint8_t _size);
 
+class BoardView;
 class Game
 {
 public:
@@ -340,30 +350,11 @@ public:
     Position * Pos;
     checker_color next_move_clr;
     uint8_t _size;
+    BoardView * board;
     GameFunctions * funct;
-    Game(uint8_t size)
-    {
-        funct= new GameFunctions(size);
-        CheckersList=new ItemsList <CVItem>;
-        next_move_clr=_white;
-        _size=size;
-        Pos = new Position (_size, CheckersList, next_move_clr);
-        pList=new ItemsList <Position>;
-    }
-    void next_move_list()
-    {
-        delete Pos;
-        next_move_clr=reverse(next_move_clr);
-        Pos= new Position(_size, CheckersList, next_move_clr);
-        funct->MakeMovesList(Pos, pList);
-    }
-    ~Game()
-    {
-        delete CheckersList;
-        delete Pos;
-        delete pList;
-        delete funct;
-    }
+    Game(uint8_t size);
+    void next_move_list(Ui_Dialog * ui);
+    ~Game();
 
 };
 

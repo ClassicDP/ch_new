@@ -119,6 +119,7 @@ public:
     double Xpos(uint8_t _pos);
     double Ypos(uint8_t _pos);
     uint8_t Pos();
+
 public:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
