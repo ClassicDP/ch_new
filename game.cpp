@@ -1,4 +1,3 @@
-#include "game.h"
 #include "checker_vis.h"
 #include <QDebug>
 #include <QGraphicsPixmapItem>
@@ -173,9 +172,9 @@ Position::Position(uint8_t Size, ItemsList<CVItem> *CheckersList, checker_color 
     while (CheckersList->CurrentItem())
     {
         Ch * ch=CheckersList->CurrentItem();
-//        ch->_pos=CheckersList->CurrentItem()->_Y()*Size+CheckersList->CurrentItem()->_X();
-//        ch->_type=CheckersList->CurrentItem()->_type;
-//        ch->_color=CheckersList->CurrentItem()->_color;
+        //        ch->_pos=CheckersList->CurrentItem()->_Y()*Size+CheckersList->CurrentItem()->_X();
+        //        ch->_type=CheckersList->CurrentItem()->_type;
+        //        ch->_color=CheckersList->CurrentItem()->_color;
         board[ch->_pos]=ChList[ch->_color]->AddItem(ch);
         CheckersList->SetToNext();
     }
@@ -191,13 +190,15 @@ Game::Game(uint8_t size)
     pList=new ItemsList <Position>;
 }
 
-void Game::next_move_list(Ui_Dialog *ui)
+void Game::next_move_list(Ui_Dialog *_ui)
 {
+    if (_ui) {this->ui=_ui; next_move_clr=reverse(next_move_clr);}
+
     delete Pos;
+    next_move_clr=reverse(next_move_clr);
     Pos= new Position(_size, CheckersList, next_move_clr);
     pList->ClearList();
     funct->MakeMovesList(Pos, pList);
-    next_move_clr=reverse(next_move_clr);
 
     pList->SetToStart();
     ui->listWidget->clear();
@@ -212,7 +213,6 @@ void Game::next_move_list(Ui_Dialog *ui)
     ui->treeWidget->clear();
     ui->treeWidget->addTopLevelItems(*vList);
     board->PTree= new PTreeMoves(pList);
-
 }
 
 Game::~Game()

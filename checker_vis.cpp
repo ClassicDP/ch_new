@@ -111,7 +111,7 @@ inline bool is_king(checker_color clr, BoardView *brd,uint8_t x)
 
 void CVItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (scene->game->IsEdit)
+    if (board->game->IsEdit)
     {
         if (!this->isField)
         {
@@ -162,7 +162,7 @@ void CVItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 void CVItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     return;
-    if (scene->game->IsEdit) return;
+    if (board->game->IsEdit) return;
     // in Board check
     double dx=mapToScene(event->pos()).x()-board->ChAnimation->mxPos+dX();
     double dy=mapToScene(event->pos()).y()-board->ChAnimation->myPos+dY();
@@ -216,7 +216,7 @@ void CVItem::TrackLoop()
             ChX->setZValue(1);
             board->ChAnimation->LineMoveAnimation
                     (ChX,ChX->Xpos(xx->to), ChX->Ypos(xx->to), 100, 700);
-//            qDebug () << "animation start"<< ChX->_X() << ChX->_Y();
+            //            qDebug () << "animation start"<< ChX->_X() << ChX->_Y();
             ChX->_pos=xx->to;
             if (is_king(ChX->_color, scene->board, xx->to))
             {
@@ -228,7 +228,6 @@ void CVItem::TrackLoop()
                 auto yy=(CVItem *) board->ChSearch(xx->kill);
                 XX->to_delete->AddItem(yy);
                 yy->killed=_yes;
-
                 yy->UpdatePixmap();
             }
             if (XX->Wait_for_First) {
@@ -237,13 +236,15 @@ void CVItem::TrackLoop()
                 while (XX->to_delete->Curr)
                 {
                     board->CheckersList->
-                     Delete(board->CheckersList->searchIt(XX->to_delete->CurrentItem()));
+                            Delete(board->CheckersList->searchIt(XX->to_delete->CurrentItem()));
                     XX->to_delete->SetToNext();
                     board->Draw();
                 }
+                board->game->next_move_list();
                 return;
             }
         }
+
     } while (board->last_points->Count==1);
 }
 

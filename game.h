@@ -352,8 +352,9 @@ public:
     uint8_t _size;
     BoardView * board;
     GameFunctions * funct;
+    Ui_Dialog * ui;
     Game(uint8_t size);
-    void next_move_list(Ui_Dialog * ui);
+    void next_move_list(Ui_Dialog * _ui=NULL);
     ~Game();
 
 };

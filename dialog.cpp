@@ -12,10 +12,11 @@ Dialog::Dialog(QWidget *parent) :
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
-    game = new Game(_size);
-    board=new BoardView(parent, _size, game, game->CheckersList);
-    game->board=board;
+    board=new BoardView(parent, _size);
     ui->Layout->addWidget(board);
+    board->game = new Game(_size);
+    board->game->board=board;
+    board->CheckersList=board->game->CheckersList;
     board->Draw();
 
 }
@@ -28,8 +29,8 @@ Dialog::~Dialog()
 
 void Dialog::on_pushButton_clicked()
 {
-    game->IsEdit^=1;
-    if (game->IsEdit)
+    board->game->IsEdit^=1;
+    if (board->game->IsEdit)
     {
         ui->pushButton->setText("Редактор");
         ui->pushButton_3->setText("Начальная");
@@ -44,14 +45,14 @@ void Dialog::on_pushButton_clicked()
 
 void Dialog::on_pushButton_2_clicked()
 {
-    game->next_move_list(ui);
+    board->game->next_move_list(ui);
 }
 
 
 
 void Dialog::on_pushButton_3_clicked()
 {
-    if (game->IsEdit)
+    if (board->game->IsEdit)
     {
         board->start_pos();
         board->Draw();

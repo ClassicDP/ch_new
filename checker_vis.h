@@ -61,6 +61,7 @@ public:
     PTreeMoves *PTree;
     ItemsList <CVItem> * last_points=new ItemsList <CVItem>;
     Animation * ChAnimation= new Animation;
+    Game * game;
     uint8_t size;
     explicit BoardView(QWidget *parent = 0,  uint8_t size=8, Game * game=NULL, ItemsList<CVItem> *CheckersList=NULL);
     ~BoardView();
@@ -78,7 +79,6 @@ public:
 class ChGrapicsScene:public QGraphicsScene
 {
 public:
-    Game * game;
     BoardView * board;
     uint8_t size;
     double w,h,t,l;

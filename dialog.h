@@ -33,7 +33,6 @@ private slots:
 private:
     Ui::Dialog *ui;
     BoardView * board;
-    Game * game;
     Position * Pos;
 
 };

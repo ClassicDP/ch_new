@@ -86,7 +86,7 @@ BoardView::BoardView(QWidget *parent, uint8_t size, Game *game, ItemsList<CVItem
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scene=new ChGrapicsScene (this);
-    scene->game=game;
+    this->game=game;
     this->setScene(scene);
     this->size=size;
 }
