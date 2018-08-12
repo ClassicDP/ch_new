@@ -4,7 +4,6 @@
 #include <QTimeLine>
 #include "game.h"
 #include "itemlist.h"
-#include "boardview.h"
 #include <QGraphicsView>
 #include "checker_vis.h"
 #include <QDebug>
@@ -177,23 +176,12 @@ void CVItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void CVItem::RefreshPoints(ItemsList <MoveTreeItem> * top, bool clear_only)
 {
-    board->last_points->SetToStart();
-    while (board->last_points->Curr)
-    {
-        scene->removeItem(board->last_points->CurrentItem());
-        board->last_points->SetToNext();
-    }
+
+    for (auto it=board->last_points->begin();it;it=board->last_points->next())
+        scene->removeItem(it);
     board->last_points->ClearLate();
-    if (!clear_only)
-    {
-        top->SetToStart();
-        while (top->Curr)
-        {
-            board->last_points->
-                    AddItem(board->SetPoint(top->CurrentItem()->move->to));
-            top->SetToNext();
-        }
-    }
+    if (!clear_only) for (auto it=top->begin();it;it=top->next())
+        board->last_points->AddItem(board->SetPoint(it->move->to));
 }
 void CVItem::TrackLoop()
 {
@@ -255,7 +243,7 @@ ChGrapicsScene::ChGrapicsScene(BoardView * board):board(board){}
 void ChGrapicsScene::SetParams(double w, double h, uint8_t size, double t, double l)
 {
     sq=w<h?w:h;
-    this->w=w;this->h=h;this->t=t;this->l-l;this->size=size;
+    this->w=w;this->h=h;this->t=t;this->l=l;this->size=size;
     fsize=sq/size;
 }
 

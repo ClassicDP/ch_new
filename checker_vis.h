@@ -9,6 +9,7 @@
 #include <QTimeLine>
 #include "game.h"
 #include "itemlist.h"
+#include "stddef.h"
 
 enum checker_onboard {_on=0, _off=1};
 
@@ -63,7 +64,7 @@ public:
     Animation * ChAnimation= new Animation;
     Game * game;
     uint8_t size;
-    explicit BoardView(QWidget *parent = 0,  uint8_t size=8, Game * game=NULL, ItemsList<CVItem> *CheckersList=NULL);
+    explicit BoardView(QWidget *parent = nullptr,  uint8_t size=8, Game * game=nullptr, ItemsList<CVItem> *CheckersList=nullptr);
     ~BoardView();
     void Draw();
     CVItem *SetPoint(uint8_t pos);
@@ -100,7 +101,7 @@ class CVItem: public QObject, public QGraphicsPixmapItem, public BoardItem
     ChGrapicsScene * scene;
 public:
     BoardView * board;
-    ItemsList <MoveTreeItem> * tree=NULL;
+    ItemsList <MoveTreeItem> * tree=nullptr;
     BoardItem *brd_it;
     bool isField;
     bool selected;

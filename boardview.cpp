@@ -1,4 +1,3 @@
-#include "boardview.h"
 #include "checker_vis.h"
 #include <QDebug>
 
@@ -62,7 +61,7 @@ void Animation::TrackMoveAnimation(CVItem *Ch, int xPos, int yPos, int StepCount
 
 void Animation::TrackAnimation(CVItem *Ch, ItemsList<MoveTreeItem> *movesTrack, int8_t from, int8_t cnt)
 {
-    if (cnt<0) cnt=movesTrack->Count;
+    if (cnt<0) cnt=int8_t(movesTrack->Count);
     if (from<0) from=0;
     movesTrack->SetToStart();
     int i=0;
@@ -73,7 +72,7 @@ void Animation::TrackAnimation(CVItem *Ch, ItemsList<MoveTreeItem> *movesTrack, 
             cnt--;
             double X = Ch->Xpos(movesTrack->CurrentItem()->move->to);
             double Y = Ch->Ypos(movesTrack->CurrentItem()->move->to);
-            TrackMoveAnimation(Ch, X,Y,100,3000);
+            TrackMoveAnimation(Ch, int(X),int(Y),100,3000);
         }
         i++;
         movesTrack->SetToNext();
@@ -100,7 +99,7 @@ void BoardView::Draw()
 {
     foreach (auto it, scene->items()) {
         scene->removeItem(it);
-        ((QObject *) (it))->deleteLater();
+        (reinterpret_cast<QObject *>(it))->deleteLater();
     }
     double height=this->height();
     double width=this->width();
@@ -108,7 +107,7 @@ void BoardView::Draw()
     height=height-2*height/size/3;
     width=height;
     scene->SetParams(width,height,size);
-    fW=scene->fsize/3;
+    fW=uint8_t(scene->fsize/3);
     qDebug() << frameSize() << scene->fsize<< fW;
     scene->setSceneRect(-fW,-fW,width+2*fW,height+2*fW);
     QBrush brush(0xE7CBAB);
@@ -117,7 +116,7 @@ void BoardView::Draw()
     pen.setWidth(2);
     scene->addRect(-1, -1, width+2, height+2, pen);
     pen.setWidth(1);
-    for (int i=0;i<size;i++)
+    for (uint8_t i=0;i<size;i++)
     {
         QGraphicsTextItem *txt;
         txt=scene->addText(QString('0'+((white_down)?(size-i):(i+1))));
@@ -130,7 +129,7 @@ void BoardView::Draw()
 
         txt->setPos((i+0.3)*scene->fsize, height-fW*0.2);
 
-        for (int j=0;j<size;j++)
+        for (uint8_t j=0;j<size;j++)
         {
             if ((i+j)%2)
             {
@@ -175,7 +174,7 @@ CVItem * BoardView::SetPoint(uint8_t pos)
 void BoardView::DeletePoint(CVItem  *item)
 {
     delete item;
-    item=NULL;
+    item=nullptr;
 }
 CVItem * BoardView::SetSelected(uint8_t pos)
 {
@@ -201,7 +200,7 @@ CVItem *BoardView::ChSearch(uint8_t pos)
             return CheckersList->CurrentItem();
         CheckersList->SetToNext();
     }
-    return NULL;
+    return nullptr;
 }
 
 void BoardView::resizeEvent(QResizeEvent *event)
@@ -213,8 +212,8 @@ void BoardView::start_pos()
 {
     CheckersList->ClearLate();
     int rows=size/2;
-    for (int i=0;i<size;i++)
-        for (int j=0;j<size;j++)
+    for (uint8_t i=0;i<size;i++)
+        for (uint8_t j=0;j<size;j++)
         {
             if ((i+j)%2) continue;
             if (i<(rows-1)) CheckersList->AddItem(new CVItem(new BoardItem (_white,_simple,j,i,size),scene));

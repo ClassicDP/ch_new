@@ -35,9 +35,7 @@ HEADERS += \
     itemlist.h \
     dialog.h \
     game.h \
-    boardview.h \
-    checker_vis.h \
-    fastlist.h
+    checker_vis.h
 
 FORMS += \
         dialog.ui

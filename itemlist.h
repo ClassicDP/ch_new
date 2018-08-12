@@ -1,7 +1,8 @@
 #ifndef ITEMLIST_H
 #define ITEMLIST_H
 #include <algorithm>
-#define NULL nullptr
+#include <iterator>
+//#define NULL nullptr
 
 template <typename T>
 inline void swap_(T & x, T & y )
@@ -15,15 +16,16 @@ template <typename T>
 struct ItemOfList
 {
     T * It;
-    ItemOfList *Next = NULL;
-    ItemOfList *Prev = NULL;
+    ItemOfList *Next = nullptr;
+    ItemOfList *Prev = nullptr;
 };
 
 template <typename T>
 class ItemsList
 {
 
-public:
+public:    
+
     ItemOfList <T> *First;
     ItemOfList <T> *Last;
     ItemOfList <T> *Curr;
@@ -35,42 +37,48 @@ public:
         Curr=Last;
         Count = 0;
     }
-    bool SetToStart()
+    inline void SetToStart()
     {
         Curr=First;
-        if (!First) return 0;
-        return 1;
     }
-    void SetToNext()
+    inline void SetToEnd()
     {
-        if (Curr)
-        {
-            Curr=Curr->Next;
-        }
+        Curr=Last;
     }
-    void SetToPrev()
+    inline void SetToNext()
     {
-        if (Curr)
-        {
-            Curr=Curr->Prev;
-        }
+        if (Curr) Curr=Curr->Next;
     }
-    T * CurrentItem()
+    inline void SetToPrev()
+    {
+        if (Curr) Curr=Curr->Prev;
+    }
+    inline T* begin()
+    {
+        SetToStart();
+        return CurrentItem();
+    }
+    inline T* end()
+    {
+        Curr=Last;
+        return CurrentItem();
+    }
+    inline T * CurrentItem()
     {
         if (Curr) return Curr->It;
-        else return NULL;
+        else return nullptr;
     }
-    T * NextItem()
+    inline T * next()
     {
         if (Curr) Curr=Curr->Next;
         if (Curr) return Curr->It;
-        else return NULL;
+        else return nullptr;
     }
-    T * PrevItem()
+    inline T * prev()
     {
         if (Curr->Prev) Curr=Curr->Prev;
         if (Curr) return Curr->It;
-        else return NULL;
+        else return nullptr;
     }
     ItemOfList <T> * AddItem(T * it)
     {
@@ -162,7 +170,7 @@ public:
             if (!(--(X->It->PtrCnt)))
             {
                 delete X->It;
-                X->It=NULL;
+                X->It=nullptr;
             }
         }
         if(X->Prev)
@@ -224,4 +232,8 @@ public:
         ClearList();
     }
 };
+
+
+
+
 #endif // ITEMLIST_H

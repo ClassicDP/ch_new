@@ -14,7 +14,7 @@ bool GameFunctions::TryToKill(Position *ps, ItemsList<Position> *PosList, MoveIt
     {
         if (i==skipDir) continue;
         int8_t type=chIt->_type;
-        int8_t x0=chIt->_pos; int8_t x1=x0+ve[i];
+        auto x0=chIt->_pos; int8_t x1=x0+ve[i];
         //search first not empty field by ve[] direction if _king type
         if (type==_king) while (isOnBoard(x1) && !ps->board[x1]) x1+=ve[i];
         if (!isOnBoard(x1) || !ps->board[x1]) continue;
@@ -34,11 +34,11 @@ bool GameFunctions::TryToKill(Position *ps, ItemsList<Position> *PosList, MoveIt
                 auto type= chIt->_type;//save status before check for revers
                 //check for simple revers to king by move
                 if (type!=_king && is_king(ps,x2)) ps->board[x0]->It->_type=_king;
-                MoveItem * newMove = new MoveItem(move,x0,x2,x1);
+                MoveItem * newMove = new MoveItem(move,x0,uint8_t(x2),x1);
                 //reverse color of killed checker before recursion//swap for jamp-move
                 ps->board[x1]->It->_color=reverse(ps->board[x1]->It->_color);
                 swap_(ps->board[x0],ps->board[x2]);
-                chIt->_pos=x2;
+                chIt->_pos=uint8_t(x2);
                 auto SaveMoreDeepStatus=MoreDeepWasPossible;auto saveCaseClean_e=PosList->Last;
                 MoreDeepWasPossible|=TryToKill(ps, PosList, newMove, SkipDirection, MoreDeepWasPossible);
                 //clean false positions from list if more deep move was faund
@@ -68,7 +68,7 @@ bool GameFunctions::TryToKill(Position *ps, ItemsList<Position> *PosList, MoveIt
         while (xx)
         {
             newPos->ChList[!newPos->ClrOfMove]->Delete(newPos->board[xx->kill]);
-            newPos->board[xx->kill]=NULL;
+            newPos->board[xx->kill]=nullptr;
             xx=xx->conn;
         }
         //Add to list
@@ -81,16 +81,16 @@ bool GameFunctions::TryToMove(Position *ps, ItemsList<Position> *PosList, MoveIt
 {
     bool res=false;
     auto ChIt=ps->ChList[ps->ClrOfMove]->CurrentItem();
-    int a,b;
+    int8_t a,b;
     //select possible directions
     if (ChIt->_type==_king) {a=0;b=4;}
     else if (ChIt->_color==_white) {a=0;b=2;} else {a=2;b=4;}
-    int8_t x0=ChIt->_pos;
+    auto x0=ChIt->_pos;
     int8_t x1;
     auto type= ChIt->_type;//save status for posible revers
     for (int8_t i=a; i<b; i++)
     {
-        x1=x0;
+        x1=int8_t(x0);
         do
         {
             x1+=ve[i];
@@ -99,9 +99,9 @@ bool GameFunctions::TryToMove(Position *ps, ItemsList<Position> *PosList, MoveIt
             res=true;
             //check for simple revers to king by move
             if (type!=_king && is_king(ps,x1)) ChIt->_type=_king;
-            ChIt->_pos=x1;
+            ChIt->_pos=uint8_t(x1);
             auto newPos=new Position(ps);
-            newPos->move=new MoveItem(move,x0,x1);
+            newPos->move=new MoveItem(move,uint8_t(x0),uint8_t(x1));
             swap_(newPos->board[x0],newPos->board[x1]);
             //Add to list
             PosList->AddItem(newPos);
@@ -140,8 +140,8 @@ QString Pos2Str(int pos, int Size)
 {
     QString res;
     int8_t x[2];
-    x[0]='A'+pos%Size;
-    x[1]='1'+pos/Size;
+    x[0]='A'+int8_t(pos%Size);
+    x[1]='1'+int8_t(pos/Size);
     res=x[0];
     res+=x[1];
     return res;
@@ -161,23 +161,15 @@ QString MoveTreeItem::toString(uint8_t Size)
 
 Position::Position(uint8_t Size, ItemsList<CVItem> *CheckersList, checker_color nextMoveColor)
 {
-    len=Size*Size;
+    len=uint8_t(Size*Size);
     this->Size=Size;
     board = new ItemOfList <Ch>* [len];
     ChList[0]=new ItemsList <Ch>;
     ChList[1]=new ItemsList <Ch>;
-    fill(&board[0],len, NULL);
+    fill(&board[0],len, nullptr);
     this->ClrOfMove=nextMoveColor;
-    CheckersList->SetToStart();
-    while (CheckersList->CurrentItem())
-    {
-        Ch * ch=CheckersList->CurrentItem();
-        //        ch->_pos=CheckersList->CurrentItem()->_Y()*Size+CheckersList->CurrentItem()->_X();
-        //        ch->_type=CheckersList->CurrentItem()->_type;
-        //        ch->_color=CheckersList->CurrentItem()->_color;
+    for (Ch * ch=CheckersList->begin();ch;ch=CheckersList->next())
         board[ch->_pos]=ChList[ch->_color]->AddItem(ch);
-        CheckersList->SetToNext();
-    }
 }
 
 Game::Game(uint8_t size)
@@ -193,20 +185,14 @@ Game::Game(uint8_t size)
 void Game::next_move_list(Ui_Dialog *_ui)
 {
     if (_ui) {this->ui=_ui; next_move_clr=reverse(next_move_clr);}
-
     delete Pos;
     next_move_clr=reverse(next_move_clr);
     Pos= new Position(_size, CheckersList, next_move_clr);
     pList->ClearList();
     funct->MakeMovesList(Pos, pList);
-
-    pList->SetToStart();
     ui->listWidget->clear();
-    while (pList->CurrentItem())
-    {
-        ui->listWidget->addItem(pList->CurrentItem()->MoveAsStr());
-        pList->SetToNext();
-    }
+    for (auto it=pList->begin();it;it=pList->next())
+        ui->listWidget->addItem(it->MoveAsStr());
     QList<QTreeWidgetItem*> *vList=new QList<QTreeWidgetItem*>;
     auto tree=PTreeMoves(pList);
     AddToTree(vList, tree.top, board->size);
@@ -225,14 +211,13 @@ Game::~Game()
 
 void AddToTree(QList<QTreeWidgetItem *> *vList, ItemsList<MoveTreeItem> *tree, uint8_t _size)
 {
-    tree->SetToStart();
-    while (tree->CurrentItem()) {
-        QTreeWidgetItem *it=new QTreeWidgetItem;
-        it->setText(0,tree->CurrentItem()->toString(_size));
-        vList->append(it);
+    for (auto it=tree->begin();it;it=tree->next())
+    {
+        QTreeWidgetItem *it_=new QTreeWidgetItem;
+        it_->setText(0,it->toString(_size));
+        vList->append(it_);
         QList<QTreeWidgetItem*> *yy=new QList<QTreeWidgetItem*>;
-        AddToTree(yy,tree->CurrentItem()->next, _size);
-        it->addChildren(*yy);
-        tree->SetToNext();
+        AddToTree(yy,it->next, _size);
+        it_->addChildren(*yy);
     }
 }
