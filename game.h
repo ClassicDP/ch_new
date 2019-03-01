@@ -106,6 +106,14 @@ OutputIterator fill (OutputIterator first, Size n, const T& val)
     }
     return first;     // since C++11
 }
+struct Empirical
+{
+    long int agility[2]={0,0}; //_black=0, _white=1
+    long int deep[2]={0,0};//_black=0, _white=1
+
+};
+bool operator < (const Empirical &v1, const Empirical &v2);
+bool operator > (const Empirical &v1, const Empirical &v2);
 
 class CVItem;
 class Position
@@ -130,17 +138,8 @@ public:
         auto CurrItem0=pos->ChList[0]->Curr;
         auto CurrItem1=pos->ChList[1]->Curr;
         for (int i=0;i<2;i++)
-        {
-            if (!pos->ChList[i]->Count) continue;
-            pos->ChList[i]->SetToStart();
-            auto tmp=pos->ChList[i]->CurrentItem();
-            while (tmp)
-            {
-                board[tmp->_pos]=ChList[i]->AddItem(tmp);
-                pos->ChList[i]->SetToNext();
-                tmp=pos->ChList[i]->CurrentItem();
-            }
-        }
+            for (auto it=pos->ChList[i]->begin();it;it=pos->ChList[i]->next())
+                board[it->_pos]=ChList[i]->AddItem(it);
         pos->ChList[0]->Curr=CurrItem0;
         pos->ChList[1]->Curr=CurrItem1;
     }

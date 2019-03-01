@@ -5,9 +5,12 @@
 #-------------------------------------------------
 
 QT       += core gui
+CONFIG += c++11
 
+#greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT = core gui widgets
+
 
 TARGET = View1
 TEMPLATE = app
@@ -35,7 +38,9 @@ HEADERS += \
     itemlist.h \
     dialog.h \
     game.h \
-    checker_vis.h
+    checker_vis.h \
+    sortlist.h \
+
 
 FORMS += \
         dialog.ui

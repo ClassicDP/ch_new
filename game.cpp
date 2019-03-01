@@ -32,7 +32,7 @@ bool GameFunctions::TryToKill(Position *ps, ItemsList<Position> *PosList, MoveIt
                 qDebug() << x2 << ps->board[x2];
                 res=true;
                 auto type= chIt->_type;//save status before check for revers
-                //check for simple revers to king by move
+                //check for simple revers to king by kill
                 if (type!=_king && is_king(ps,x2)) ps->board[x0]->It->_type=_king;
                 MoveItem * newMove = new MoveItem(move,x0,uint8_t(x2),x1);
                 //reverse color of killed checker before recursion//swap for jamp-move
@@ -220,4 +220,16 @@ void AddToTree(QList<QTreeWidgetItem *> *vList, ItemsList<MoveTreeItem> *tree, u
         AddToTree(yy,it->next, _size);
         it_->addChildren(*yy);
     }
+}
+
+bool operator <(const Empirical &v1, const Empirical &v2)
+{
+    auto k1=v1.agility[_white]*v2.agility[_black]*v1.deep[_black]*v2.deep[_white];
+    auto k2=v1.agility[_black]*v2.agility[_white]*v1.deep[_white]*v2.deep[_black];
+    return k1<k2;
+}
+
+bool operator >(const Empirical &v1, const Empirical &v2)
+{
+    return !(v1<v2);
 }

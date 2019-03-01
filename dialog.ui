@@ -6,59 +6,45 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>675</width>
-    <height>415</height>
+    <width>960</width>
+    <height>515</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <layout class="QFormLayout" name="Layout"/>
+   </item>
+   <item>
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Vertical</enum>
      </property>
-     <widget class="QWidget" name="formLayoutWidget_2">
-      <layout class="QFormLayout" name="Layout"/>
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>Редактор</string>
+      </property>
      </widget>
-     <widget class="QWidget" name="formLayoutWidget">
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QPushButton" name="pushButton">
-         <property name="text">
-          <string>Редактор</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_3">
-         <property name="text">
-          <string>Начальная</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_2">
-         <property name="text">
-          <string>MakeList</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTreeWidget" name="treeWidget">
-         <column>
-          <property name="text">
-           <string notr="true">1</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-       <item>
-        <widget class="QListWidget" name="listWidget"/>
-       </item>
-      </layout>
+     <widget class="QPushButton" name="pushButton_3">
+      <property name="text">
+       <string>Начальная</string>
+      </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="text">
+       <string>MakeList</string>
+      </property>
+     </widget>
+     <widget class="QTreeWidget" name="treeWidget">
+      <column>
+       <property name="text">
+        <string notr="true">1</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QListWidget" name="listWidget"/>
     </widget>
    </item>
   </layout>

@@ -93,7 +93,7 @@ double CVItem::Xpos(uint8_t pos)
 }
 double CVItem::Ypos(uint8_t pos)
 {
-    u_int8_t j=pos/scene->size;
+    uint8_t j=pos/scene->size;
     return (scene->size-j-1)*scene->fsize;
 }
 

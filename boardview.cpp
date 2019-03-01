@@ -103,7 +103,7 @@ void BoardView::Draw()
     }
     double height=this->height();
     double width=this->width();
-    height=std::min(height,width);
+    height=std::max(height,width);
     height=height-2*height/size/3;
     width=height;
     scene->SetParams(width,height,size);
@@ -162,7 +162,7 @@ void BoardView::Draw()
 
 CVItem * BoardView::SetPoint(uint8_t pos)
 {
-    uint8_t i=pos%scene->size;u_int8_t j=pos/scene->size;
+    uint8_t i=pos%scene->size;uint8_t j=pos/scene->size;
     CVItem * field=new CVItem(i,j,scene);
     field->setPixmap(*Pixmaps.PM_pointMove);
     field->setScale(scene->fsize/field->pixmap().width());
@@ -178,7 +178,7 @@ void BoardView::DeletePoint(CVItem  *item)
 }
 CVItem * BoardView::SetSelected(uint8_t pos)
 {
-    uint8_t i=pos%scene->size;u_int8_t j=pos/scene->size;
+    uint8_t i=pos%scene->size;uint8_t j=pos/scene->size;
     CVItem * field=new CVItem(i,j,scene);
     field->setPixmap(*Pixmaps.PM_selectedFeild);
     field->setScale(scene->fsize/field->pixmap().width());
