@@ -38,9 +38,15 @@ HEADERS += \
     itemlist.h \
     dialog.h \
     game.h \
+<<<<<<< HEAD
     checker_vis.h \
     sortlist.h \
 
+=======
+    boardview.h \
+    checker_vis.h \
+    fastlist.h
+>>>>>>> parent of f375763... solving some problems
 
 FORMS += \
         dialog.ui
