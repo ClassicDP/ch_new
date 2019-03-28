@@ -113,8 +113,12 @@ void BoardView::Draw()
     scene->SetParams(width,height,size);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     fW=uint8_t(scene->fsize/3);
 
+=======
+    fW=scene->fsize/3;
+>>>>>>> parent of f375763... solving some problems
 =======
     fW=scene->fsize/3;
 >>>>>>> parent of f375763... solving some problems

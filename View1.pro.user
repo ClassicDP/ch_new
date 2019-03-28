@@ -2,7 +2,11 @@
 <!DOCTYPE QtCreatorProject>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <!-- Written by QtCreator 4.8.2, 2019-03-17T15:28:58. -->
+=======
+<!-- Written by QtCreator 4.6.2, 2018-07-12T18:03:50. -->
+>>>>>>> parent of f375763... solving some problems
 =======
 <!-- Written by QtCreator 4.6.2, 2018-07-12T18:03:50. -->
 >>>>>>> parent of f375763... solving some problems
@@ -64,6 +68,7 @@
   <variable>ProjectExplorer.Project.PluginSettings</variable>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   <valuemap type="QVariantMap">
    <valuelist type="QVariantList" key="ClangCodeModel.CustomCommandLineKey">
     <value type="QString">-fno-delayed-template-parsing</value>
@@ -75,6 +80,9 @@
    <valuelist type="QVariantList" key="ClangTools.SuppressedDiagnostics"/>
    <value type="bool" key="ClangTools.UseGlobalSettings">true</value>
   </valuemap>
+=======
+  <valuemap type="QVariantMap"/>
+>>>>>>> parent of f375763... solving some problems
 =======
   <valuemap type="QVariantMap"/>
 >>>>>>> parent of f375763... solving some problems

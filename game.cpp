@@ -170,6 +170,7 @@ Position::Position(uint8_t Size, ItemsList<Ch> *CheckersList, checker_color next
     this->ClrOfMove=nextMoveColor;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     for (Ch * it=CheckersList->begin();it;it=CheckersList->next())
     {
         board[it->_pos]=ChList[it->_color]->AddItem(new Ch(it));
@@ -199,6 +200,8 @@ Position::Position(Position *pos)//copy of object
 =======
 =======
 >>>>>>> parent of f375763... solving some problems
+=======
+>>>>>>> parent of f375763... solving some problems
     CheckersList->SetToStart();
     while (CheckersList->CurrentItem())
     {
@@ -210,6 +213,9 @@ Position::Position(Position *pos)//copy of object
         CheckersList->SetToNext();
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of f375763... solving some problems
+=======
 >>>>>>> parent of f375763... solving some problems
 =======
 >>>>>>> parent of f375763... solving some problems
@@ -230,8 +236,11 @@ void Game::next_move_list(Ui_Dialog *_ui, BoardView * board)
     if (_ui) {this->ui=_ui; next_move_clr=reverse(next_move_clr);}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     //if (Pos) delete Pos;
 =======
+=======
+>>>>>>> parent of f375763... solving some problems
 =======
 >>>>>>> parent of f375763... solving some problems
 
@@ -249,6 +258,9 @@ void Game::next_move_list(Ui_Dialog *_ui, BoardView * board)
 
     pList->SetToStart();
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of f375763... solving some problems
+=======
 >>>>>>> parent of f375763... solving some problems
 =======
 >>>>>>> parent of f375763... solving some problems
