@@ -81,7 +81,8 @@ void Animation::TrackAnimation(CVItem *Ch, ItemsList<MoveTreeItem> *movesTrack, 
 
 BoardView::BoardView(QWidget *parent, uint8_t size, Game *game, ItemsList<CVItem> *CheckersList)
 {
-    this->CheckersList=CheckersList;
+    if (CheckersList) this->CheckersList=CheckersList;
+    else this->CheckersList = new ItemsList<CVItem>;
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scene=new ChGrapicsScene (this);
@@ -104,10 +105,13 @@ void BoardView::Draw()
     double height=this->height();
     double width=this->width();
     height=std::max(height,width);
+    this->setMinimumWidth(width);
+    qDebug () << height;
     height=height-2*height/size/3;
     width=height;
     scene->SetParams(width,height,size);
     fW=uint8_t(scene->fsize/3);
+
     qDebug() << frameSize() << scene->fsize<< fW;
     scene->setSceneRect(-fW,-fW,width+2*fW,height+2*fW);
     QBrush brush(0xE7CBAB);

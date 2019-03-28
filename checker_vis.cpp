@@ -17,8 +17,7 @@ CVItem::CVItem(BoardItem * board_item, ChGrapicsScene *scene, QPixmap pix):Board
     this->brd_it=board_item;
     this->scene=scene;
     board=scene->board;
-    setPixmap(pix);
-    setScale(scene->fsize/pix.width());
+    setPixmap(pix.scaledToWidth(int(scene->fsize),Qt::SmoothTransformation));
     setPos(dX(),dY());
     selected=0;
 

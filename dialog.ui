@@ -6,48 +6,69 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>960</width>
-    <height>515</height>
+    <width>895</width>
+    <height>669</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
-   <item>
-    <layout class="QFormLayout" name="Layout"/>
-   </item>
-   <item>
-    <widget class="QSplitter" name="splitter">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
+  <widget class="QWidget" name="formLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>620</x>
+     <y>30</y>
+     <width>258</width>
+     <height>498</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
      <widget class="QPushButton" name="pushButton">
       <property name="text">
        <string>Редактор</string>
       </property>
      </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="pushButton_3">
       <property name="text">
        <string>Начальная</string>
       </property>
      </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="pushButton_2">
       <property name="text">
        <string>MakeList</string>
       </property>
      </widget>
+    </item>
+    <item>
      <widget class="QTreeWidget" name="treeWidget">
       <column>
        <property name="text">
-        <string notr="true">1</string>
+        <string>Move Variants...</string>
        </property>
       </column>
      </widget>
+    </item>
+    <item>
      <widget class="QListWidget" name="listWidget"/>
-    </widget>
-   </item>
-  </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="formLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>601</width>
+     <height>591</height>
+    </rect>
+   </property>
+   <layout class="QFormLayout" name="Layout"/>
+  </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

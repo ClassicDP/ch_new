@@ -15,10 +15,7 @@ Dialog::Dialog(QWidget *parent) :
     board=new BoardView(parent, _size);
     ui->Layout->addWidget(board);
     board->game = new Game(_size);
-    board->game->board=board;
-    board->CheckersList=board->game->CheckersList;
-    board->Draw();
-
+    //board->game->board=board;
 }
 
 
@@ -45,7 +42,9 @@ void Dialog::on_pushButton_clicked()
 
 void Dialog::on_pushButton_2_clicked()
 {
-    board->game->next_move_list(ui);
+//    for (auto it=board->CheckersList->begin();it;it=board->CheckersList->next())
+//        board->game->CheckersList->AddItem(new Ch(it->_pos,it->_type,it->_color));
+    board->game->next_move_list(ui, board);
 }
 
 

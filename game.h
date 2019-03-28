@@ -12,6 +12,8 @@
 enum checker_type { _simple=0, _king=1};
 enum checker_color {_black=0, _white=1};
 enum checker_killed {_yes=1,_no=0};
+enum checker_onboard {_on=0, _off=1};
+
 
 struct BaseItem
 {
@@ -22,8 +24,20 @@ struct Ch:BaseItem
     uint8_t _pos;// pos - position on board
     checker_type _type;
     checker_color _color;
+    Ch(){}
+    Ch(uint8_t _pos, checker_type _type, checker_color _color):
+        _pos(_pos),_type(_type),_color(_color){}
+    Ch(Ch * x) : _pos(x->_pos), _type(x->_type), _color(x->_color){}
 };
 
+inline bool operator == (Ch & a, Ch & b)
+{return (a._pos==b._pos &&
+         a._color==b._color &&
+         a._type==b._type);}
+inline bool operator != (Ch & a, Ch & b)
+{
+    return !(a==b);
+}
 class BoardItem:public Ch
 {
 public:
@@ -125,24 +139,9 @@ public:
     checker_color ClrOfMove;//color of next move
     ItemsList <Ch> *ChList[2];//checkers on board
     MoveItem * move=nullptr;//Move track (chain to back);
-    Position (uint8_t Size, ItemsList <CVItem> * CheckersList, checker_color nextMoveColor);
-    Position (Position * pos)//copy of object
-    {
-        len=pos->len;
-        Size=pos->Size;
-        ClrOfMove=pos->ClrOfMove;
-        board = new ItemOfList <Ch>* [len];
-        ChList[0]=new ItemsList <Ch>;
-        ChList[1]=new ItemsList <Ch>;
-        fill(&board[0],len,nullptr);
-        auto CurrItem0=pos->ChList[0]->Curr;
-        auto CurrItem1=pos->ChList[1]->Curr;
-        for (int i=0;i<2;i++)
-            for (auto it=pos->ChList[i]->begin();it;it=pos->ChList[i]->next())
-                board[it->_pos]=ChList[i]->AddItem(it);
-        pos->ChList[0]->Curr=CurrItem0;
-        pos->ChList[1]->Curr=CurrItem1;
-    }
+    int Q_C[2][2]={{0, 0}, {0, 0}};//[Color][Type] count of checkers and quins
+    Position (uint8_t Size, ItemsList <Ch> * CheckersList, checker_color nextMoveColor);
+    Position (Position * pos);
     QString PosToStr(int8_t pos)
     {
         QString res;
@@ -182,6 +181,8 @@ public:
         // !!!        while (track) {auto tmp=track;track=track->prev;delete tmp;}
     }
 };
+bool operator == (Position & a, Position & b);
+bool operator != (Position & a, Position & b);
 
 inline checker_color reverse(checker_color x)
 {
@@ -328,14 +329,14 @@ public:
     ItemsList <CVItem> * CheckersList;
     bool IsEdit=true;
     ItemsList <Position> * pList;
-    Position * Pos;
+    //Position * Pos;
     checker_color next_move_clr;
     uint8_t _size;
     BoardView * board;
     GameFunctions * funct;
     Ui_Dialog * ui;
     Game(uint8_t size);
-    void next_move_list(Ui_Dialog * _ui=nullptr);
+    void next_move_list(Ui_Dialog *_ui=nullptr, BoardView * board=nullptr);
     ~Game();
 };
 

@@ -116,19 +116,19 @@ bool GameFunctions::TryToMove(Position *ps, ItemsList<Position> *PosList, MoveIt
 bool GameFunctions::MakeMovesList(Position *ps, ItemsList<Position> *PosList)
 {
     bool res=false;
-    auto tmp=ps->ChList[ps->ClrOfMove];
-    tmp->SetToStart();
-    while (tmp->CurrentItem())
+    auto ch=ps->ChList[ps->ClrOfMove];
+    ch->SetToStart();
+    while (ch->CurrentItem())
     {
         res|=TryToKill(ps,PosList);
-        tmp->SetToNext();
+        ch->SetToNext();
     }
     if (res) return res;// exit if Kill possible
-    tmp->SetToStart();
-    while (tmp->CurrentItem())
+    ch->SetToStart();
+    while (ch->CurrentItem())
     {
         res|=TryToMove(ps,PosList);
-        tmp->SetToNext();
+        ch->SetToNext();
     }
     return res;
 }
@@ -159,7 +159,7 @@ QString MoveTreeItem::toString(uint8_t Size)
                           Pos2Str(move->from, Size)+":"+Pos2Str(move->to, Size);
 }
 
-Position::Position(uint8_t Size, ItemsList<CVItem> *CheckersList, checker_color nextMoveColor)
+Position::Position(uint8_t Size, ItemsList<Ch> *CheckersList, checker_color nextMoveColor)
 {
     len=uint8_t(Size*Size);
     this->Size=Size;
@@ -168,8 +168,32 @@ Position::Position(uint8_t Size, ItemsList<CVItem> *CheckersList, checker_color 
     ChList[1]=new ItemsList <Ch>;
     fill(&board[0],len, nullptr);
     this->ClrOfMove=nextMoveColor;
-    for (Ch * ch=CheckersList->begin();ch;ch=CheckersList->next())
-        board[ch->_pos]=ChList[ch->_color]->AddItem(ch);
+    for (Ch * it=CheckersList->begin();it;it=CheckersList->next())
+    {
+        board[it->_pos]=ChList[it->_color]->AddItem(new Ch(it));
+        Q_C[it->_color][it->_type]++;
+    }
+}
+
+Position::Position(Position *pos)//copy of object
+{
+    len=pos->len;
+    Size=pos->Size;
+    ClrOfMove=pos->ClrOfMove;
+    board = new ItemOfList <Ch>* [len];
+    ChList[0]=new ItemsList <Ch>;
+    ChList[1]=new ItemsList <Ch>;
+    fill(&board[0],len,nullptr);
+    auto CurrItem0=pos->ChList[0]->Curr;
+    auto CurrItem1=pos->ChList[1]->Curr;
+    for (int i=0;i<2;i++)
+        for (auto it=pos->ChList[i]->begin();it;it=pos->ChList[i]->next())
+        {
+            board[it->_pos]=ChList[i]->AddItem(new Ch(it));
+            Q_C[it->_color][it->_type]++;
+        }
+    pos->ChList[0]->Curr=CurrItem0;
+    pos->ChList[1]->Curr=CurrItem1;
 }
 
 Game::Game(uint8_t size)
@@ -178,27 +202,29 @@ Game::Game(uint8_t size)
     CheckersList=new ItemsList <CVItem>;
     next_move_clr=_white;
     _size=size;
-    Pos = new Position (_size, CheckersList, next_move_clr);
+    //Pos = new Position (_size, CheckersList, next_move_clr);
     pList=new ItemsList <Position>;
 }
 
-void Game::next_move_list(Ui_Dialog *_ui)
+void Game::next_move_list(Ui_Dialog *_ui, BoardView * board)
 {
     if (_ui) {this->ui=_ui; next_move_clr=reverse(next_move_clr);}
-    delete Pos;
+    //if (Pos) delete Pos;
     next_move_clr=reverse(next_move_clr);
-    Pos= new Position(_size, CheckersList, next_move_clr);
+    //Pos= new Position(_size, CheckersList, next_move_clr);
+    //auto P1=new Position(Pos);
+    //if (*Pos==*P1) {Pos->ClrOfMove=P1->ClrOfMove;};
     pList->ClearList();
-    funct->MakeMovesList(Pos, pList);
+    funct->MakeMovesList(board->pos(), pList);
     ui->listWidget->clear();
     for (auto it=pList->begin();it;it=pList->next())
         ui->listWidget->addItem(it->MoveAsStr());
     QList<QTreeWidgetItem*> *vList=new QList<QTreeWidgetItem*>;
     auto tree=PTreeMoves(pList);
-    AddToTree(vList, tree.top, board->size);
+    AddToTree(vList, tree.top, _size);
     ui->treeWidget->clear();
     ui->treeWidget->addTopLevelItems(*vList);
-    board->PTree= new PTreeMoves(pList);
+    if (board) board->PTree= new PTreeMoves(pList);
 }
 
 Game::~Game()
@@ -232,4 +258,20 @@ bool operator <(const Empirical &v1, const Empirical &v2)
 bool operator >(const Empirical &v1, const Empirical &v2)
 {
     return !(v1<v2);
+}
+
+bool operator ==(Position &a, Position &b)
+{
+    if (a.ChList[0]->Count!=b.ChList[1]->Count) return false;
+    if (a.ClrOfMove!=b.ClrOfMove) return false;
+    for (auto i=a.ChList[0]->begin();i;i=a.ChList[0]->next())
+    {
+        if (*i!=*a.board[i->_pos]->It) return false;
+    }
+    return true;
+}
+
+bool operator !=(Position &a, Position &b)
+{
+    return !(a==b);
 }
