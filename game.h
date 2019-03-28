@@ -139,12 +139,15 @@ public:
     checker_color ClrOfMove;//color of next move
     ItemsList <Ch> *ChList[2];//checkers on board
 <<<<<<< HEAD
+<<<<<<< HEAD
     MoveItem * move=nullptr;//Move track (chain to back);
     int Q_C[2][2]={{0, 0}, {0, 0}};//[Color][Type] count of checkers and quins
     Position (uint8_t Size, ItemsList <Ch> * CheckersList, checker_color nextMoveColor);
     Position (Position * pos);
     QString PosToStr(int8_t pos)
 =======
+=======
+>>>>>>> parent of f375763... solving some problems
     MoveItem * move=NULL;//Move track (chain to back);
     Position (uint8_t Size, ItemsList <CVItem> * CheckersList, checker_color nextMoveColor);
     Position (Position * pos)//copy of object
@@ -174,6 +177,9 @@ public:
         pos->ChList[1]->Curr=CurrItem1;
     }
     QString PosToStr(int pos)
+<<<<<<< HEAD
+>>>>>>> parent of f375763... solving some problems
+=======
 >>>>>>> parent of f375763... solving some problems
     {
         QString res;
@@ -387,7 +393,11 @@ public:
     Ui_Dialog * ui;
     Game(uint8_t size);
 <<<<<<< HEAD
+<<<<<<< HEAD
     void next_move_list(Ui_Dialog *_ui=nullptr, BoardView * board=nullptr);
+=======
+    void next_move_list(Ui_Dialog * _ui=NULL);
+>>>>>>> parent of f375763... solving some problems
 =======
     void next_move_list(Ui_Dialog * _ui=NULL);
 >>>>>>> parent of f375763... solving some problems

@@ -39,9 +39,15 @@ HEADERS += \
     dialog.h \
     game.h \
 <<<<<<< HEAD
+<<<<<<< HEAD
     checker_vis.h \
     sortlist.h \
 
+=======
+    boardview.h \
+    checker_vis.h \
+    fastlist.h
+>>>>>>> parent of f375763... solving some problems
 =======
     boardview.h \
     checker_vis.h \
